@@ -75,7 +75,7 @@ date = datetime.datetime.now()
 my_lock = threading.RLock()
 end = str(pd.Timestamp.today() + pd.DateOffset(5))[0:10]
 start_5m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
-start_15m = str(pd.Timestamp.today() + pd.DateOffset(-1))[0:10]
+start_15m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
 start_30m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
 start_1h = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
 start_6h = str(pd.Timestamp.today() + pd.DateOffset(-20))[0:10]
@@ -208,14 +208,13 @@ def courbe(pourcent_chercher2,tiker_live,time1,time_name1,pourcent_chercher,pour
         target1 = J[1] + ((moyenne_tete*30) / 100)
         target2 = J[1] - ((moyenne_tete*5) / 100)
         button2.on_clicked(lambda event: achat(ticker, target1, target2))
+        now = datetime.datetime.now()
+        plt.savefig(f'capture/{now.strftime("%Hh:%M:%S")}')
         plt.show()
 
 
     # ----- creer la figure et l'affichage MATPLOTLIB -----#
     except:
-        remplacement('%log%',
-                     f'{datetime.datetime.now()} PROBLEME D\'AFFICHAGE MATPLOTLIB SUR: {ticker} {time1} {time_name1}\n%log%',
-                     'Log.txt', f'Log.txt')
         Write.Print("<⛔> <⛔> <⛔> <⛔> ERREUR CRITIQUE <⛔> <⛔> <⛔> <⛔>", Colors.red, interval=0.000)
         print('')
 
@@ -240,25 +239,6 @@ def line_intersection(line1, line2):
 
 # ----- fonction pour trouver les point intersection de la ligne de coup et de la Courbe -----#
 
-# ----- fonction pour remplacer et ecrire dans le fichier log -----#
-def remplacement(nom, remplace, fichier_lecture, fichier_modif):  # pour remplacer les varible de la feuille imprimable
-    try:
-        file = open(f"{fichier_lecture}", "r+")
-        a = str(file.read())
-        file.close()
-        file = open(f"{fichier_modif}", "w")
-
-        a = a.replace(f'{nom}', f'{remplace}')
-        file.write(a)
-        file.close()
-        # Write.Print("  Remplacement reussi  !", Colors.green, interval=0.000)
-        print('')
-    except:
-        # Write.Print("!! Remplacement echoué  !!", Colors.red, interval=0.000)
-        print('')
-
-
-# ----- fonction pour remplacer et ecrire dans le fichier log -----#
 
 # ----- fonction Principale -----#
 def Finder_IETE(time1, time_name1, start1):
@@ -277,13 +257,10 @@ def Finder_IETE(time1, time_name1, start1):
     with my_lock:
         try:
             api_url_livePrice = f'http://api.polygon.io/v2/last/trade/{tiker_live}?apiKey={api_key}'
-            #api_url_livePrice = 'http://ab-trading.fr/data.json'
             data = requests.get(api_url_livePrice).json()
             df_livePrice = pd.DataFrame(data)
 
-            # api_url_OHLC = f'http://api.polygon.io/v2/aggs/ticker/{ticker}/range/15/minute/2022-07-01/2022-07-15?adjusted=true&sort=asc&limit=30000&apiKey={api_key}'
             api_url_OHLC = f'http://api.polygon.io/v2/aggs/ticker/{ticker}/range/{time1}/{time_name1}/{start1}/{end}?adjusted=true&limit=50000&apiKey={api_key}'
-            #api_url_OHLC = 'http://ab-trading.fr/data2.json'
 
             data = requests.get(api_url_OHLC).json()
             df = pd.DataFrame(data['results'])
@@ -295,9 +272,6 @@ def Finder_IETE(time1, time_name1, start1):
             livePrice = df_livePrice['results'].iloc[la_place_de_p]
             passed1 = True
         except:
-            remplacement('%log%',
-                         f'{datetime.datetime.now()} PROBLEME DE CONNECTION AU TITRE ET (OU) DE RESULTAT SUR: {ticker} {time1} {time_name1}\n%log%',
-                         'Log.txt', f'Log.txt')
             Write.Print("<⛔> <⛔> <⛔> <⛔> ERREUR CRITIQUE <⛔> <⛔> <⛔> <⛔>", Colors.red, interval=0.000)
             print('')
 
@@ -338,11 +312,6 @@ def Finder_IETE(time1, time_name1, start1):
         # ----- creation des locals(min/max) -----#
         local_max = argrelextrema(df['c'].values, np.greater, order=1, mode='clip')[0]
         local_min = argrelextrema(df['c'].values, np.less, order=1, mode='clip')[0]
-        local_max1 = argrelextrema(df['c'].values, np.greater, order=1, mode='clip')[0]
-        local_min1 = argrelextrema(df['c'].values, np.less, order=1, mode='clip')[0]
-
-        local_max2 = argrelextrema(df['c'].values, np.greater, order=1, mode='clip')[0]
-        local_min2 = argrelextrema(df['c'].values, np.less, order=1, mode='clip')[0]
         # ----- creation des locals(min/max) -----#
 
         # ----- suppression des points morts de la courbe -----#
@@ -374,10 +343,6 @@ def Finder_IETE(time1, time_name1, start1):
             len1 = len(local_min)
             len2 = len(local_max)
 
-        highs = df.iloc[local_max, :]
-        lows = df.iloc[local_min, :]
-        highs1 = df.iloc[test_max, :]
-        lows1 = df.iloc[test_min, :]
 
         decalage = 0
         # ----- suppression des points morts de la courbe -----#
@@ -393,13 +358,6 @@ def Finder_IETE(time1, time_name1, start1):
             F = float(df['c'].iloc[local_min[-1]])
             G = float(livePrice)
 
-            data_A = []
-            data_B = []
-            data_C = []
-            data_D = []
-            data_E = []
-            data_F = []
-            data_G = []
 
             passed2 = True
 
@@ -571,7 +529,7 @@ def Finder_IETE(time1, time_name1, start1):
                         pourcent_chercher = round(pourcent_chercher, 2)
 
                         prix_chercher = df['c'].values[-2] + (df['c'].values[-2] * 0.015)
-                        difference_chercher = prix_chercher - df['c'].values[-2]
+                        difference_chercher = prix_chercher - J[1]
                         tout_savoir = (difference_chercher*100)/moyenne_tete
                         tout_savoir = round(tout_savoir, 2)
 
@@ -669,21 +627,7 @@ def Finder_IETE(time1, time_name1, start1):
                         thread = Process(target=courbe, args=(pourcent_chercher2,tiker_live,time1,time_name1,pourcent_chercher,pourcent_perdu,note,debugage,dejatoucher2,mirande3,mirande2,J,I,moyenne_tete,moins50p,local_min,local_max,A,B,C,D,E,F,G,df,place_liveprice,tout_savoir))
                         thread.start()
 
-                        # ----- determiner le temps d'attente avant de reafficher une figure deja sortie (mais obsolette) -----#
-                        #multiplicateur = 0
-                        #if time_name1 == 'minute':
-                        #    multiplicateur = 60
-#
-                        #if time_name1 == 'hour':
-                        #    multiplicateur = 3600
-#
-                        #if time_name1 == 'day':
-                        #    multiplicateur = 86400
-#
-                        #temps_attente = time1 * multiplicateur
-                        #time.sleep(temps_attente)
-                        # ----- determiner le temps d'attente avant de reafficher une figure deja sortie (mais obsolette) -----#
-                        # ----- enregister des données inutiles -----#
+
                 print('----------------------------------------------------------------------', flush=True)
                 time.sleep(0.5)
 
@@ -698,5 +642,75 @@ jour = "day"
 # ----- traduction francais anglais pour appel polygon -----#
 
 # ----- enssembles des Process à lancer en meme temps -----#
-Finder_IETE(15, minute, start_15m)
+th1 = Process(target=Finder_IETE, args=(15, minute, start_15m))
+th2 = Process(target=Finder_IETE, args=(20, minute, start_15m))
+th3 = Process(target=Finder_IETE, args=(25, minute, start_15m))
+th4 = Process(target=Finder_IETE, args=(30, minute, start_30m))
+th5 = Process(target=Finder_IETE, args=(35, minute, start_30m))
+th6 = Process(target=Finder_IETE, args=(45, minute, start_30m))
+th7 = Process(target=Finder_IETE, args=(1, heure, start_1h))
+th8 = Process(target=Finder_IETE, args=(2, heure, start_1h))
+th9 = Process(target=Finder_IETE, args=(4, heure, start_1h))
+th10 = Process(target=Finder_IETE, args=(40, minute, start_30m))
+th11 = Process(target=Finder_IETE, args=(50, minute, start_30m))
+th12 = Process(target=Finder_IETE, args=(55, minute, start_30m))
+th13 = Process(target=Finder_IETE, args=(30, minute, start_30m))
+th14 = Process(target=Finder_IETE, args=(75, minute, start_1h))
+th15 = Process(target=Finder_IETE, args=(90, minute, start_1h))
+th16 = Process(target=Finder_IETE, args=(105, minute, start_1h))  # ici nouveau
+th17 = Process(target=Finder_IETE, args=(135, minute, start_1h))
+th18 = Process(target=Finder_IETE, args=(150, minute, start_1h))
+th19 = Process(target=Finder_IETE, args=(165, minute, start_1h))
+th20 = Process(target=Finder_IETE, args=(195, minute, start_1h))
+th21 = Process(target=Finder_IETE, args=(210, minute, start_1h))
+th22 = Process(target=Finder_IETE, args=(225, minute, start_1h))
+th23 = Process(target=Finder_IETE, args=(255, minute, start_1h))
+
+th1.start()
+th2.start()
+th3.start()
+th4.start()
+th5.start()
+th6.start()
+th7.start()
+th8.start()
+th9.start()
+th10.start()
+th11.start()
+th12.start()
+th13.start()
+th14.start()
+th15.start()
+th16.start()  # ici nouveau
+th17.start()
+th18.start()
+th19.start()
+th20.start()
+th21.start()
+th22.start()
+th23.start()
+
+th1.join()
+th2.join()
+th3.join()
+th4.join()
+th5.join()
+th6.join()
+th7.join()
+th8.join()
+th9.join()
+th10.join()
+th11.join()
+th12.join()
+th13.join()
+th14.join()
+th15.join()
+th16.join()  # ici nouveau
+th17.join()
+th18.join()
+th19.join()
+th20.join()
+th21.join()
+th22.join()
+th23.join()
 
