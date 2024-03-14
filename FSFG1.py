@@ -75,7 +75,7 @@ date = datetime.datetime.now()
 my_lock = threading.RLock()
 end = str(pd.Timestamp.today() + pd.DateOffset(5))[0:10]
 start_5m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
-start_15m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
+start_15m = str(pd.Timestamp.today() + pd.DateOffset(-1))[0:10]
 start_30m = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
 start_1h = str(pd.Timestamp.today() + pd.DateOffset(-15))[0:10]
 start_6h = str(pd.Timestamp.today() + pd.DateOffset(-20))[0:10]
@@ -683,23 +683,6 @@ def Finder_IETE(time1, time_name1, start1):
                         #temps_attente = time1 * multiplicateur
                         #time.sleep(temps_attente)
                         # ----- determiner le temps d'attente avant de reafficher une figure deja sortie (mais obsolette) -----#
-
-                        # ----- enregister des données inutiles -----#
-                        data_A.append(A)
-                        data_B.append(B)
-                        data_C.append(C)
-                        data_D.append(D)
-                        data_E.append(E)
-                        data_F.append(F)
-                        data_F.append(G)
-                        data_A_ = pd.DataFrame(data_A, columns=['A'])
-                        data_B_ = pd.DataFrame(data_B, columns=['B'])
-                        data_C_ = pd.DataFrame(data_C, columns=['C'])
-                        data_D_ = pd.DataFrame(data_D, columns=['D'])
-                        data_E_ = pd.DataFrame(data_E, columns=['E'])
-                        data_F_ = pd.DataFrame(data_E, columns=['F'])
-                        data_G_ = pd.DataFrame(data_E, columns=['G'])
-                        df_IETE = pd.concat([data_A_, data_B_, data_C_, data_D_, data_E_, data_F_, data_G_], axis=1)
                         # ----- enregister des données inutiles -----#
                 print('----------------------------------------------------------------------', flush=True)
                 time.sleep(0.5)
@@ -715,75 +698,5 @@ jour = "day"
 # ----- traduction francais anglais pour appel polygon -----#
 
 # ----- enssembles des Process à lancer en meme temps -----#
-th1 = Process(target=Finder_IETE, args=(15, minute, start_15m))
-th2 = Process(target=Finder_IETE, args=(15, minute, start_15m))
-th3 = Process(target=Finder_IETE, args=(25, minute, start_15m))
-th4 = Process(target=Finder_IETE, args=(30, minute, start_30m))
-th5 = Process(target=Finder_IETE, args=(35, minute, start_30m))
-th6 = Process(target=Finder_IETE, args=(45, minute, start_30m))
-th7 = Process(target=Finder_IETE, args=(1, heure, start_1h))
-th8 = Process(target=Finder_IETE, args=(2, heure, start_1h))
-th9 = Process(target=Finder_IETE, args=(4, heure, start_1h))
-th10 = Process(target=Finder_IETE, args=(40, minute, start_30m))
-th11 = Process(target=Finder_IETE, args=(50, minute, start_30m))
-th12 = Process(target=Finder_IETE, args=(55, minute, start_30m))
-th13 = Process(target=Finder_IETE, args=(30, minute, start_30m))
-th14 = Process(target=Finder_IETE, args=(75, minute, start_1h))
-th15 = Process(target=Finder_IETE, args=(90, minute, start_1h))
-th16 = Process(target=Finder_IETE, args=(105, minute, start_1h))  # ici nouveau
-th17 = Process(target=Finder_IETE, args=(135, minute, start_1h))
-th18 = Process(target=Finder_IETE, args=(150, minute, start_1h))
-th19 = Process(target=Finder_IETE, args=(165, minute, start_1h))
-th20 = Process(target=Finder_IETE, args=(195, minute, start_1h))
-th21 = Process(target=Finder_IETE, args=(210, minute, start_1h))
-th22 = Process(target=Finder_IETE, args=(225, minute, start_1h))
-th23 = Process(target=Finder_IETE, args=(255, minute, start_1h))
-
-th1.start()
-th2.start()
-th3.start()
-th4.start()
-th5.start()
-th6.start()
-th7.start()
-th8.start()
-th9.start()
-th10.start()
-th11.start()
-th12.start()
-th13.start()
-th14.start()
-th15.start()
-th16.start()  # ici nouveau
-th17.start()
-th18.start()
-th19.start()
-th20.start()
-th21.start()
-th22.start()
-th23.start()
-
-th1.join()
-th2.join()
-th3.join()
-th4.join()
-th5.join()
-th6.join()
-th7.join()
-th8.join()
-th9.join()
-th10.join()
-th11.join()
-th12.join()
-th13.join()
-th14.join()
-th15.join()
-th16.join()  # ici nouveau
-th17.join()
-th18.join()
-th19.join()
-th20.join()
-th21.join()
-th22.join()
-th23.join()
+Finder_IETE(15, minute, start_15m)
 
